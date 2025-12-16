@@ -1,0 +1,14 @@
+实验实际开始时间: 2025-10-24 11:49:16
+刺激参数：
+刺激个数: 4
+刺激呈现总数量: 180
+刺激持续时间: 2.0 秒
+刺激间隔: 6.0 秒
+背景色: (128, 128, 128)
+全屏模式: True
+
+计划呈现序列：
+['LC4', 'IC2', 'IC4', 'LC4', 'IC4', 'LC2', 'LC2', 'IC2', 'IC2', 'LC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC4', 'IC4', 'LC4', 'IC4', 'IC4', 'IC4', 'IC2', 'IC4', 'LC2', 'IC4', 'IC4', 'IC2', 'IC2', 'LC2', 'IC2', 'LC4', 'LC2', 'IC2', 'IC2', 'LC4', 'IC2', 'IC4', 'LC4', 'IC2', 'LC2', 'IC2', 'LC2', 'LC4', 'LC4', 'IC4', 'LC2', 'IC4', 'IC2', 'IC4', 'LC2', 'LC2', 'IC2', 'LC4', 'LC4', 'LC4', 'LC4', 'LC2', 'IC4', 'IC2', 'IC4', 'LC4', 'IC4', 'IC2', 'IC2', 'IC4', 'IC4', 'IC4', 'IC4', 'LC2', 'IC4', 'IC2', 'LC4', 'LC4', 'IC2', 'LC2', 'IC2', 'IC4', 'LC2', 'LC4', 'LC4', 'LC4', 'IC2', 'LC4', 'IC2', 'IC2', 'LC2', 'IC4', 'IC4', 'IC2', 'LC2', 'LC2', 'IC4', 'LC2', 'IC4', 'LC2', 'IC2', 'LC2', 'LC4', 'LC4', 'LC2', 'IC4', 'LC4', 'LC2', 'LC4', 'IC2', 'LC4', 'LC2', 'IC2', 'IC2', 'LC4', 'LC4', 'IC4', 'LC2', 'LC4', 'LC4', 'IC4', 'LC4', 'LC2', 'LC4', 'IC2', 'IC4', 'IC2', 'LC2', 'LC4', 'LC4', 'LC4', 'IC2', 'IC2', 'IC4', 'IC4', 'LC2', 'IC2', 'IC4', 'IC4', 'IC2', 'LC2', 'LC2', 'IC2', 'LC4', 'LC2', 'IC4', 'IC2', 'LC2', 'LC2', 'LC4', 'IC2', 'LC4', 'IC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC4', 'IC4', 'LC2', 'IC2', 'LC4', 'IC4', 'LC2', 'LC4', 'IC4', 'IC4', 'LC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC2', 'IC2', 'IC2', 'LC2', 'LC2', 'IC2', 'LC2', 'IC4', 'LC2', 'LC4', 'LC2', 'LC4', 'IC4', 'IC4']
+实际呈现刺激数量: 180
+实际呈现序列 (已呈现): 
+['LC4', 'IC2', 'IC4', 'LC4', 'IC4', 'LC2', 'LC2', 'IC2', 'IC2', 'LC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC4', 'IC4', 'LC4', 'IC4', 'IC4', 'IC4', 'IC2', 'IC4', 'LC2', 'IC4', 'IC4', 'IC2', 'IC2', 'LC2', 'IC2', 'LC4', 'LC2', 'IC2', 'IC2', 'LC4', 'IC2', 'IC4', 'LC4', 'IC2', 'LC2', 'IC2', 'LC2', 'LC4', 'LC4', 'IC4', 'LC2', 'IC4', 'IC2', 'IC4', 'LC2', 'LC2', 'IC2', 'LC4', 'LC4', 'LC4', 'LC4', 'LC2', 'IC4', 'IC2', 'IC4', 'LC4', 'IC4', 'IC2', 'IC2', 'IC4', 'IC4', 'IC4', 'IC4', 'LC2', 'IC4', 'IC2', 'LC4', 'LC4', 'IC2', 'LC2', 'IC2', 'IC4', 'LC2', 'LC4', 'LC4', 'LC4', 'IC2', 'LC4', 'IC2', 'IC2', 'LC2', 'IC4', 'IC4', 'IC2', 'LC2', 'LC2', 'IC4', 'LC2', 'IC4', 'LC2', 'IC2', 'LC2', 'LC4', 'LC4', 'LC2', 'IC4', 'LC4', 'LC2', 'LC4', 'IC2', 'LC4', 'LC2', 'IC2', 'IC2', 'LC4', 'LC4', 'IC4', 'LC2', 'LC4', 'LC4', 'IC4', 'LC4', 'LC2', 'LC4', 'IC2', 'IC4', 'IC2', 'LC2', 'LC4', 'LC4', 'LC4', 'IC2', 'IC2', 'IC4', 'IC4', 'LC2', 'IC2', 'IC4', 'IC4', 'IC2', 'LC2', 'LC2', 'IC2', 'LC4', 'LC2', 'IC4', 'IC2', 'LC2', 'LC2', 'LC4', 'IC2', 'LC4', 'IC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC4', 'IC4', 'LC2', 'IC2', 'LC4', 'IC4', 'LC2', 'LC4', 'IC4', 'IC4', 'LC2', 'LC4', 'LC2', 'IC2', 'IC4', 'LC2', 'IC2', 'IC2', 'LC2', 'LC2', 'IC2', 'LC2', 'IC4', 'LC2', 'LC4', 'LC2', 'LC4', 'IC4', 'IC4']

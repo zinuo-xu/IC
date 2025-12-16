@@ -1,0 +1,43 @@
+{
+
+    "DATA_PATH" : "C:\\Users\\xuzinuo\\Desktop\\79",
+
+    "TRIAL_INFO" : {
+            "TRIAL_START_SKIP": 0,
+            "TOTAL_TRIALS": 180
+        },
+
+    "EXP_INFO": {
+            "t_stimulus": 12,  
+            "l_stimulus": 8,   
+            "l_trials": 32,   
+            "IPD":2.0,
+            "ISI":6.0
+        },
+
+    "0.1uSec": 0,
+    "Signals": [
+        {
+            "Group": 0,
+            "Label": "EEG1",
+            "Sample rate": 1000
+        },
+        {
+            "Group": 0,
+            "Label": "EEG2",
+            "Sample rate": 1000
+        },
+        {
+            "Group": 0,
+            "Label": "EMG",
+            "Sample rate": 1000
+        },
+        {
+            "Group": 0,
+            "Label": "Activ",
+            "Sample rate": 1000
+        }
+    ],
+    "date": "24.10.2025",
+    "time": "11:24:25.000"
+}

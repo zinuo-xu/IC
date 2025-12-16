@@ -1,0 +1,36 @@
+# 数据文件（不要进 Git）
+*.csv
+*.xlsx
+*.xls
+*.mat
+*.npy
+*.npz
+*.pyc
+
+# 图片结果
+*.png
+*.jpg
+*.svg
+
+# 中间结果 / 大矩阵
+functional_connectivity/raw/
+functional_connectivity/graph_metrics/
+plot/
+update_1208/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# MATLAB
+*.m~
+
+# Imaging / large binary data
+*.tif
+*.tiff
+
+# Other common large binaries
+*.nii
+*.nii.gz
+
+
