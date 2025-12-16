@@ -1,7 +1,6 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -39,9 +38,9 @@ def load_rr_indices(index_path: Path) -> np.ndarray:
         )
     df = pd.read_csv(index_path)
     exc = df[df["category"] == "exc"]["neuron_index"].astype(int).to_numpy()
-    if exc.size != 58:
+    if exc.size != 386:
         print(
-            f"警告: 预期 58 个兴奋性 RR 神经元，实际找到 {exc.size} 个。"
+            f"警告: 预期386个兴奋性 RR 神经元，实际找到 {exc.size} 个。"
             " 将使用当前文件中的全部兴奋性神经元。"
         )
     return exc
@@ -63,65 +62,45 @@ def apply_gsr(trials: np.ndarray) -> np.ndarray:
     return trials - global_signal
 
 
-def apply_temporal_filter(trials: np.ndarray, cfg: Dict[str, float]) -> np.ndarray:
-    """按照配置对 trial 进行 Butterworth 滤波."""
+def apply_highpass_filter(trials: np.ndarray, fs: float, cutoff: float = 0.05, order: int = 2) -> np.ndarray:
+    """执行固定参数的 0.05 Hz 高通滤波。"""
     if trials.shape[2] < 5:
-        raise ValueError("时间轴长度过短，无法稳定进行滤波，请放宽窗口或跳过滤波。")
-
-    fs = cfg["fs"]
-    order = cfg["order"]
+        raise ValueError("时间轴长度过短，无法稳定进行滤波，请放宽窗口。")
     nyquist = 0.5 * fs
-    hp = cfg.get("highpass")
-    lp = cfg.get("lowpass")
-
-    if hp and lp:
-        if hp >= lp:
-            raise ValueError("高通截止频率必须小于低通截止频率。")
-        wn = [hp / nyquist, lp / nyquist]
-        btype = "bandpass"
-    elif hp:
-        wn = hp / nyquist
-        btype = "highpass"
-    elif lp:
-        wn = lp / nyquist
-        btype = "lowpass"
-    else:
-        return trials
-
-    if np.any(np.array(wn) >= 1):
-        raise ValueError("截止频率必须小于 Nyquist 频率 (fs/2)。")
-
-    b, a = signal.butter(order, wn, btype=btype)
+    if cutoff >= nyquist:
+        raise ValueError("高通截止频率必须小于 Nyquist 频率 (fs/2)。")
+    wn = cutoff / nyquist
+    b, a = signal.butter(order, wn, btype="highpass")
     padlen = min(trials.shape[2] - 1, 3 * (max(len(a), len(b)) - 1))
     filtered = signal.filtfilt(b, a, trials, axis=2, padlen=padlen)
     return filtered
 
 
+def apply_zscore(trials: np.ndarray) -> np.ndarray:
+    """按 trial×神经元对时间序列做 z-score 标准化。"""
+    mean = np.mean(trials, axis=2, keepdims=True)
+    std = np.std(trials, axis=2, keepdims=True)
+    std = np.where(std == 0, 1.0, std)
+    return (trials - mean) / std
+
+
 def preprocess_trials(
     trials: np.ndarray,
     use_gsr: bool,
-    filter_cfg: Optional[Dict[str, float]],
+    sampling_rate: float,
 ) -> np.ndarray:
     processed = trials.astype(float, copy=True)
     if use_gsr:
         processed = apply_gsr(processed)
-    if filter_cfg is not None:
-        processed = apply_temporal_filter(processed, filter_cfg)
+    processed = apply_highpass_filter(processed, fs=float(sampling_rate))
+    processed = apply_zscore(processed)
     return processed
 
 
 def build_suffix(args: argparse.Namespace) -> str:
-    parts = []
+    parts = ["hp0p05", "zscore"]
     if args.gsr:
-        parts.append("gsr")
-    if args.highpass is not None:
-        hp = str(args.highpass).replace(".", "p")
-        parts.append(f"hp{hp}")
-    if args.lowpass is not None:
-        lp = str(args.lowpass).replace(".", "p")
-        parts.append(f"lp{lp}")
-    if not parts:
-        return "raw"
+        parts.insert(0, "gsr")
     return "_".join(parts)
 
 
@@ -129,32 +108,12 @@ def main():
     parser = argparse.ArgumentParser(description="计算兴奋性 RR 功能连接矩阵")
     parser.add_argument("--gsr", action="store_true", help="对每个 trial 执行全局信号回归")
     parser.add_argument(
-        "--highpass", type=float, default=None, help="高通截止频率 (Hz)，需同时指定采样率"
-    )
-    parser.add_argument(
-        "--lowpass", type=float, default=None, help="低通截止频率 (Hz)，需同时指定采样率"
-    )
-    parser.add_argument(
-        "--filter-order", type=int, default=2, help="Butterworth 滤波器阶数 (默认 2 阶)"
-    )
-    parser.add_argument(
         "--sampling-rate",
         type=float,
-        default=None,
-        help="数据采样率 (Hz)，使用滤波时必须指定",
+        default=4.0,
+        help="数据采样率 (Hz)，用于 0.05 Hz 高通滤波，默认 4 Hz",
     )
     args = parser.parse_args()
-
-    filter_cfg = None
-    if args.highpass is not None or args.lowpass is not None:
-        if args.sampling_rate is None:
-            raise ValueError("使用滤波时必须通过 --sampling-rate 指定采样率。")
-        filter_cfg = {
-            "highpass": args.highpass,
-            "lowpass": args.lowpass,
-            "fs": float(args.sampling_rate),
-            "order": int(args.filter_order),
-        }
 
     suffix = build_suffix(args)
 
@@ -162,7 +121,7 @@ def main():
     config = load_config(project_root / "M79.json")
     data_path = Path(config["DATA_PATH"])
     cache_path = data_path / "preprocessed_data_cache.npz"
-    rr_index_path = data_path / "rr_neuron_indices.csv"
+    rr_index_path = Path(r"C:\Users\xuzinuo\Desktop\new\rr_neuron_indices.csv")
 
     segments, labels = load_preprocessed(cache_path)
     labels = labels.astype(int)
@@ -170,10 +129,15 @@ def main():
 
     stim_start = int(config["EXP_INFO"]["t_stimulus"])
     stim_len = int(config["EXP_INFO"]["l_stimulus"])
-    stim_slice = slice(stim_start, stim_start + stim_len)
+    total_len = int(config["EXP_INFO"]["l_trials"])
+    # stimulus-on: [t_stimulus, t_stimulus + l_stimulus)
+    stim_on_slice = slice(stim_start, stim_start + stim_len)
+    # stimulus-off: [0, 5) + [25, total_len) （假定总长为 32 帧）
+    off_early_slice = slice(0, 5)
+    off_late_slice = slice(25, total_len)
 
-    output_dir = data_path / "functional_connectivity"
-    output_dir.mkdir(exist_ok=True)
+    output_dir = Path(r"C:\Users\xuzinuo\Desktop\new\FC")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     for class_id, class_name in CLASS_MAP.items():
         mask = labels == class_id
@@ -181,35 +145,69 @@ def main():
         if class_trials.size == 0:
             print(f"类别 {class_name} 没有可用试次，跳过。")
             continue
-        class_trials = preprocess_trials(class_trials, args.gsr, filter_cfg)
-        stim_only = class_trials[:, :, stim_slice]
-        matrix = compute_connectivity(stim_only)
+        class_trials = preprocess_trials(class_trials, args.gsr, args.sampling_rate)
+
+        # stimulus-on / stimulus-off 两个时间窗
+        trials_on = class_trials[:, :, stim_on_slice]
+        trials_off = np.concatenate(
+            [
+                class_trials[:, :, off_early_slice],
+                class_trials[:, :, off_late_slice],
+            ],
+            axis=2,
+        )
+
+        matrix_on = compute_connectivity(trials_on)
+        matrix_off = compute_connectivity(trials_off)
 
         row_col_labels = [str(idx) for idx in rr_exc_indices]
-        df = pd.DataFrame(matrix, index=row_col_labels, columns=row_col_labels)
 
-        csv_path = output_dir / f"functional_connectivity_{class_name}_{suffix}.csv"
-        df.to_csv(csv_path, float_format="%.6f")
+        # === 保存 stimulus-on ===
+        df_on = pd.DataFrame(matrix_on, index=row_col_labels, columns=row_col_labels)
+        csv_on = output_dir / f"FC_{class_name}_on.csv"
+        df_on.to_csv(csv_on, float_format="%.6f")
 
         plt.figure(figsize=(10, 8))
         sns.heatmap(
-            df,
+            df_on,
             cmap="coolwarm",
             vmin=-1,
             vmax=1,
             square=True,
             cbar_kws={"label": "Pearson r"},
         )
-        plt.title(f"Excitatory RR Functional Connectivity ({class_name})")
+        plt.title(f"Excitatory RR Functional Connectivity ({class_name}, stimulus ON)")
         plt.xlabel("Neuron index")
         plt.ylabel("Neuron index")
-        heatmap_path = output_dir / f"functional_connectivity_{class_name}_{suffix}.png"
+        png_on = output_dir / f"FC_{class_name}_on.png"
         plt.tight_layout()
-        plt.savefig(heatmap_path, dpi=300)
+        plt.savefig(png_on, dpi=300)
+        plt.close()
+
+        # === 保存 stimulus-off ===
+        df_off = pd.DataFrame(matrix_off, index=row_col_labels, columns=row_col_labels)
+        csv_off = output_dir / f"FC_{class_name}_off.csv"
+        df_off.to_csv(csv_off, float_format="%.6f")
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(
+            df_off,
+            cmap="coolwarm",
+            vmin=-1,
+            vmax=1,
+            square=True,
+            cbar_kws={"label": "Pearson r"},
+        )
+        plt.title(f"Excitatory RR Functional Connectivity ({class_name}, stimulus OFF)")
+        plt.xlabel("Neuron index")
+        plt.ylabel("Neuron index")
+        png_off = output_dir / f"FC_{class_name}_off.png"
+        plt.tight_layout()
+        plt.savefig(png_off, dpi=300)
         plt.close()
 
         print(
-            f"类别 {class_name}: 使用 {mask.sum()} 个试次，输出矩阵到 {csv_path}，热图保存至 {heatmap_path}"
+            f"类别 {class_name}: 使用 {mask.sum()} 个试次，ON 矩阵 {csv_on}，OFF 矩阵 {csv_off}"
         )
 
 
